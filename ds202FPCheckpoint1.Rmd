@@ -9,30 +9,28 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Beer Ratings
-https://www.kaggle.com/datasets/ruthgn/beer-profile-and-ratings-data-set 
 
-This data set contains 1.5 million reviews of about 3200 beers. The main data points in this data set which we are going to use include name, style, Alcohol content, IBU, Astringency, Body, Alcohol, Bitter, Sweet, Sour, Salty, Fruits, Hoppy, Spices, Malty, and reviews of aroma, appearance, palate, taste, and overall. Fortunately this is a pre cleaned data set and there is not yet obvious data cleaning that needs to be done.
+Questions by member:
 
-
-Questions to be addressed:
-
-What are the most popular beer styles?
-
+Carly:
 How does the Alcohol content of the beer affect its overall rating?
-
-Which combination of mouth feel, taste, and flavor/aroma characteristics returns the highest ratings?
-
-Which beers have the highest aroma, appearance, palate, and taste ratings?
-
-What are the most common characteristics of beer?
-
-Which Brewery has the highest rated beers?
-
-How does the IBU score affect the overall score?
-
 Can we predict the rating of a beer based on its characteristics?
 
+Drew:
+Which Brewery has the highest rated beers?
+How does the IBU score affect the overall score?
+
+Eric:
+Which beers have the highest aroma, appearance, palate, and taste ratings?
+What are the most common characteristics of beer?
+
+Henry:
+Which combination of mouth feel, taste, and flavor/aroma characteristics returns the highest ratings?
+Can we find what characteristics will likely cause a beer to be rated highly?
+
+Gavin:
+What are the most popular beer styles?
 Can we recommend other beers if someone picks a beer they like?
 
-Can we find what characteristics will likely cause a beer to be rated highly?
+
+
