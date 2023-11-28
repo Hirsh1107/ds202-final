@@ -9,6 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+For data exploration, our data sets are relatively clean so little will need to be done for manipulation. Below are the questions divided between our group for the project.
 
 Questions by member:
 
