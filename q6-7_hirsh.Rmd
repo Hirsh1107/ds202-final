@@ -1,0 +1,15 @@
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Questions to be addressed:
+
+Which Brewery has the highest rated beers?
+
+How does the IBU score affect the overall score?
+
+```{r}
+beers <- read.csv("beer_profile_and_ratings.csv")
+```
+
