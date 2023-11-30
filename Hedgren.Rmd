@@ -4,3 +4,47 @@ author: "Team: Carly Seeck, Drew Hirsh,  Eric Hedgren, Henry Eichten, Gavin Fish
 date: "11/27/2023"
 output: html_document
 ---
+```{r}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+data <- read.csv("./beer_profile_and_ratings.csv")
+```
+
+Which beers have the highest aroma, appearance, palate, and taste ratings?
+```{r}
+# top ten beers from each category
+aromaTop <- data[c("Name", "review_aroma")]
+aromaTop <- aromaTop %>% arrange(desc(review_aroma)) %>% slice(1:10)
+colnames(aromaTop)[2] <- "Aroma Rating"
+
+appearanceTop <- data[c("Name", "review_appearance")]
+appearanceTop <- appearanceTop %>% arrange(desc(review_appearance)) %>% slice(1:10)
+colnames(appearanceTop)[2] <- "Appearance Rating"
+
+
+palateTop <- data[c("Name", "review_palate")]
+palateTop <- palateTop %>% arrange(desc(review_palate)) %>% slice(1:10)
+colnames(palateTop)[2] <- "Palate Rating"
+
+tasteTop <- data[c("Name", "review_taste")]
+tasteTop <- tasteTop %>% arrange(desc(review_taste)) %>% slice(1:10)
+colnames(tasteTop)[2] <- "Taste Rating"
+```
+
+```{r}
+kable(aromaTop, caption = "Top 10 Aroma Rated Beers", col.names = c("Name", "Aroma Rating"), format = "html", border = 2)
+```
+
+```{r}
+kable(appearanceTop, caption = "Top 10 Appearance Rated Beers", col.names = c("Name", "Appearance Rating"), format = "html", border = 2)
+```
+
+```{r}
+kable(palateTop, caption = "Top 10 Palate Rated Beers", col.names = c("Name", "Palate Rating"), format = "html", border = 2)
+```
+
+```{r}
+kable(tasteTop, caption = "Top 10 Taste Rated Beers", col.names = c("Name", "Taste Rating"), format = "html", border = 2)
+```
+
