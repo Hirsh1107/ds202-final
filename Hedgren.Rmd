@@ -4,3 +4,85 @@ author: "Team: Carly Seeck, Drew Hirsh,  Eric Hedgren, Henry Eichten, Gavin Fish
 date: "11/27/2023"
 output: html_document
 ---
+```{r}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(kableExtra)
+data <- read.csv("./beer_profile_and_ratings.csv")
+```
+
+Which beers have the highest aroma, appearance, palate, and taste ratings?
+```{r}
+# top ten beers from each category
+aromaTop <- data[c("Name", "review_aroma")]
+aromaTop <- aromaTop %>% arrange(desc(review_aroma)) %>% slice(1:10)
+colnames(aromaTop)[2] <- "Aroma Rating"
+
+appearanceTop <- data[c("Name", "review_appearance")]
+appearanceTop <- appearanceTop %>% arrange(desc(review_appearance)) %>% slice(1:10)
+colnames(appearanceTop)[2] <- "Appearance Rating"
+
+
+palateTop <- data[c("Name", "review_palate")]
+palateTop <- palateTop %>% arrange(desc(review_palate)) %>% slice(1:10)
+colnames(palateTop)[2] <- "Palate Rating"
+
+tasteTop <- data[c("Name", "review_taste")]
+tasteTop <- tasteTop %>% arrange(desc(review_taste)) %>% slice(1:10)
+colnames(tasteTop)[2] <- "Taste Rating"
+```
+
+```{r}
+kable(aromaTop, caption = "Top 10 Aroma Rated Beers", col.names = c("Name", "Aroma Rating"), format = "html", border = 2) %>% kable_styling()
+```
+
+```{r}
+kable(appearanceTop, caption = "Top 10 Appearance Rated Beers", col.names = c("Name", "Appearance Rating"), format = "html", border = 2) %>% kable_styling()
+```
+
+```{r}
+kable(palateTop, caption = "Top 10 Palate Rated Beers", col.names = c("Name", "Palate Rating"), format = "html", border = 2) %>% kable_styling()
+```
+
+```{r}
+kable(tasteTop, caption = "Top 10 Taste Rated Beers", col.names = c("Name", "Taste Rating"), format = "html", border = 2) %>% kable_styling()
+```
+
+What are the most common characteristics of beer?
+
+The following characteristics are defined by word counts found in up to 25 reviews of each beer. The assumption is that people writing reviews are more than likely describing what they do experience rather than what they do not. (Refer to the file Beer Descriptors Simplified to see the list of words that are used to calculate the values contained in each of the feature columns below)
+
+(Mouthfeel)
+9 - Astringency
+10 - Body
+11 - Alcohol
+
+(Taste)
+12 - Bitter
+13 - Sweet
+14 - Sour
+15 - Salty
+
+(Flavor And Aroma)
+16 - Fruits
+17 - Hoppy
+18 - Spices
+19 - Malty
+
+```{r}
+characteristicsRank <- colSums(data[,c("Astringency", "Body", "Alcohol", "Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")])
+
+characteristicsRank <- sort(characteristicsRank, decreasing = TRUE)
+
+characteristicsRank <- stack(characteristicsRank)
+
+colnames(characteristicsRank)[1] <- "Frequency"
+colnames(characteristicsRank)[2] <- "Characteristic"
+characteristicsRank <- characteristicsRank %>% select(Characteristic, Frequency)
+
+kable(characteristicsRank, caption = "Characteristic Frequencies", col.names = c("Characteristic", "Frequency"), format = "html", border = 2) %>% kable_styling()
+```
+
+
+
