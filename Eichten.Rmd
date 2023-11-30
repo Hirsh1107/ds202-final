@@ -4,3 +4,22 @@ author: "Team: Carly Seeck, Drew Hirsh,  Eric Hedgren, Henry Eichten, Gavin Fish
 date: "11/27/2023"
 output: html_document
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(ggplot2)
+library(readxl)
+```
+
+Importing the Dataset.
+```{r}
+data <- read.csv("./beer_profile_and_ratings.csv")
+head(data, 3)
+```
+
+Which combination of mouth feel, taste, and flavor/aroma characteristics returns the highest ratings?
+```{r}
+
+```
+
+Can we find what characteristics will likely cause a beer to be rated highly?
