@@ -9,6 +9,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 library(ggplot2)
 library(readxl)
+library(viridis)
+library(tidyr)
+library(dplyr)
+
+limit <- 100
 ```
 
 Importing the Dataset.
@@ -18,8 +23,62 @@ head(data, 3)
 ```
 
 Which combination of mouth feel, taste, and flavor/aroma characteristics returns the highest ratings?
-```{r}
 
+```{r}
+percents_flavor_data <- data.frame(data["review_overall"])
+
+percents_flavor_data$'%Bitter' <- round(data$Bitter / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Sweet' <- round(data$Sweet / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Sour' <- round(data$Sour / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Salty' <- round(data$Salty / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Fruits' <- round(data$Fruits / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Hoppy' <- round(data$Hoppy / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Spices' <- round(data$Spices / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Malty' <- round(data$Malty / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+limited_percents_flavor_data <- top_n(percents_flavor_data, limit, review_overall)
+
+head(percents_flavor_data)
+```
+
+```{r}
+flavor_data <- data[order(-data$review_overall), ]
+flavor_data <- flavor_data[c("review_overall", "Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty" )]
+
+limited_flavor_data <- top_n(flavor_data, limit, review_overall)
+
+top_10 <- top_n(flavor_data, 10, review_overall)
+
+print(top_10)
+```
+
+Data percent of variable of sum of all variables by raw values.
+```{r}
+limited_percents_flavor_data <- limited_percents_flavor_data[order(limited_percents_flavor_data$review_overall), ]
+
+limited_percents_flavor_data %>%
+    tidyr::gather(variable, value, -review_overall) %>%
+    ggplot(aes(x = variable, y = value, color = review_overall)) +
+        geom_point() +
+        scale_color_viridis_c(option = "plasma")
+```
+
+Data visualized by raw values.
+```{r}
+limited_flavor_data <- limited_flavor_data[order(limited_flavor_data$review_overall), ]
+
+limited_flavor_data %>%
+    tidyr::gather(variable, value, -review_overall) %>%
+    ggplot(aes(x = variable, y = value, color = review_overall)) +
+        geom_point() +
+        scale_color_viridis_c(option = "plasma")
 ```
 
 Can we find what characteristics will likely cause a beer to be rated highly?
