@@ -6,17 +6,23 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 beers <- read.csv("beer_profile_and_ratings.csv")
-beers
+head(beers)
 ```
 6. Which Brewery has the highest rated beers?
 ```{r}
-beers %>% 
+highest_rated_by_brewery <- beers %>% 
   group_by(Brewery) %>% 
   summarize(
-    num_reviews = sum(number_of_reviews),
-    rating = mean(review_overall)
+    review_overall = mean(review_overall),
+    review_aroma = mean(review_aroma),
+    review_appearance = mean(review_appearance),
+    review_palate = mean(review_palate),
+    review_taste = mean(review_taste),
+    num_reviews = sum(number_of_reviews)
   ) %>%
-  arrange(desc(rating))
+  arrange(desc(review_overall))
+
+highest_rated_by_brewery
 ```
 
 
