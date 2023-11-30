@@ -1,0 +1,6 @@
+---
+title: 'The Beer Necessities'
+author: "Team: Carly Seeck, Drew Hirsh,  Eric Hedgren, Henry Eichten, Gavin Fisher"
+date: "11/27/2023"
+output: html_document
+---
