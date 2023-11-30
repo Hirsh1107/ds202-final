@@ -48,3 +48,40 @@ kable(palateTop, caption = "Top 10 Palate Rated Beers", col.names = c("Name", "P
 kable(tasteTop, caption = "Top 10 Taste Rated Beers", col.names = c("Name", "Taste Rating"), format = "html", border = 2)
 ```
 
+What are the most common characteristics of beer?
+
+The following characteristics are defined by word counts found in up to 25 reviews of each beer. The assumption is that people writing reviews are more than likely describing what they do experience rather than what they do not. (Refer to the file Beer Descriptors Simplified to see the list of words that are used to calculate the values contained in each of the feature columns below)
+
+(Mouthfeel)
+9 - Astringency
+10 - Body
+11 - Alcohol
+
+(Taste)
+12 - Bitter
+13 - Sweet
+14 - Sour
+15 - Salty
+
+(Flavor And Aroma)
+16 - Fruits
+17 - Hoppy
+18 - Spices
+19 - Malty
+
+```{r}
+characteristicsRank <- colSums(data[,c("Astringency", "Body", "Alcohol", "Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")])
+
+characteristicsRank <- sort(characteristicsRank, decreasing = TRUE)
+
+characteristicsRank <- stack(characteristicsRank)
+
+colnames(characteristicsRank)[1] <- "Frequency"
+colnames(characteristicsRank)[2] <- "Characteristic"
+characteristicsRank <- characteristicsRank %>% select(Characteristic, Frequency)
+
+kable(characteristicsRank, caption = "Characteristic Frequencies", col.names = c("Characteristic", "Frequency"), format = "html", border = 2)
+```
+
+
+
