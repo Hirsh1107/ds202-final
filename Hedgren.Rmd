@@ -8,6 +8,7 @@ output: html_document
 library(dplyr)
 library(ggplot2)
 library(knitr)
+library(kableExtra)
 data <- read.csv("./beer_profile_and_ratings.csv")
 ```
 
@@ -33,19 +34,19 @@ colnames(tasteTop)[2] <- "Taste Rating"
 ```
 
 ```{r}
-kable(aromaTop, caption = "Top 10 Aroma Rated Beers", col.names = c("Name", "Aroma Rating"), format = "html", border = 2)
+kable(aromaTop, caption = "Top 10 Aroma Rated Beers", col.names = c("Name", "Aroma Rating"), format = "html", border = 2) %>% kable_styling()
 ```
 
 ```{r}
-kable(appearanceTop, caption = "Top 10 Appearance Rated Beers", col.names = c("Name", "Appearance Rating"), format = "html", border = 2)
+kable(appearanceTop, caption = "Top 10 Appearance Rated Beers", col.names = c("Name", "Appearance Rating"), format = "html", border = 2) %>% kable_styling()
 ```
 
 ```{r}
-kable(palateTop, caption = "Top 10 Palate Rated Beers", col.names = c("Name", "Palate Rating"), format = "html", border = 2)
+kable(palateTop, caption = "Top 10 Palate Rated Beers", col.names = c("Name", "Palate Rating"), format = "html", border = 2) %>% kable_styling()
 ```
 
 ```{r}
-kable(tasteTop, caption = "Top 10 Taste Rated Beers", col.names = c("Name", "Taste Rating"), format = "html", border = 2)
+kable(tasteTop, caption = "Top 10 Taste Rated Beers", col.names = c("Name", "Taste Rating"), format = "html", border = 2) %>% kable_styling()
 ```
 
 What are the most common characteristics of beer?
@@ -80,7 +81,7 @@ colnames(characteristicsRank)[1] <- "Frequency"
 colnames(characteristicsRank)[2] <- "Characteristic"
 characteristicsRank <- characteristicsRank %>% select(Characteristic, Frequency)
 
-kable(characteristicsRank, caption = "Characteristic Frequencies", col.names = c("Characteristic", "Frequency"), format = "html", border = 2)
+kable(characteristicsRank, caption = "Characteristic Frequencies", col.names = c("Characteristic", "Frequency"), format = "html", border = 2) %>% kable_styling()
 ```
 
 
