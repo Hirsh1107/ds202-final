@@ -3,13 +3,25 @@
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Questions to be addressed:
-
-Which Brewery has the highest rated beers?
-
-How does the IBU score affect the overall score?
-
 ```{r}
+library(tidyverse)
 beers <- read.csv("beer_profile_and_ratings.csv")
+beers
+```
+6. Which Brewery has the highest rated beers?
+```{r}
+beers %>% 
+  group_by(Brewery) %>% 
+  summarize(
+    num_reviews = sum(number_of_reviews),
+    rating = mean(review_overall)
+  ) %>%
+  arrange(desc(rating))
+```
+
+
+7. How does the IBU score affect the overall score?
+```{r}
+
 ```
 
