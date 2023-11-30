@@ -59,7 +59,7 @@ top_10 <- top_n(flavor_data, 10, review_overall)
 print(top_10)
 ```
 
-Data percent of variable of sum of all variables by raw values.
+Data visualized by percent of variable of sum of all variables by raw values.
 ```{r}
 limited_percents_flavor_data <- limited_percents_flavor_data[order(limited_percents_flavor_data$review_overall), ]
 
