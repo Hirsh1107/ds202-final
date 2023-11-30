@@ -65,9 +65,9 @@ limited_percents_flavor_data <- limited_percents_flavor_data[order(limited_perce
 
 limited_percents_flavor_data %>%
     tidyr::gather(variable, value, -review_overall) %>%
-    ggplot(aes(x = variable, y = value, color = review_overall)) +
-        geom_point() +
-        scale_color_viridis_c(option = "plasma")
+    ggplot(aes(x = variable, y = value, fill = variable)) +
+        geom_boxplot() +
+        theme_minimal()
 ```
 
 Data visualized by raw values.
@@ -76,9 +76,9 @@ limited_flavor_data <- limited_flavor_data[order(limited_flavor_data$review_over
 
 limited_flavor_data %>%
     tidyr::gather(variable, value, -review_overall) %>%
-    ggplot(aes(x = variable, y = value, color = review_overall)) +
-        geom_point() +
-        scale_color_viridis_c(option = "plasma")
+    ggplot(aes(x = variable, y = value, fill = variable)) +
+        geom_boxplot() +
+        theme_minimal()
 ```
 
 Can we find what characteristics will likely cause a beer to be rated highly?
