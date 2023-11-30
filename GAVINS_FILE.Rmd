@@ -1,0 +1,60 @@
+---
+title: 'The Beer Necessities - Gavins Questions'
+author: "Gavin Fisher"
+date: "11/30/2023"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+What are the most popular beer styles?
+```{r}
+library(dplyr)
+data <- read.csv("beer_profile_and_ratings.csv")
+
+beer_ratings <- data %>%
+  group_by(Style) %>%
+  summarise(Avg_Review = mean(review_overall, na.rm = TRUE))
+
+highest_rated_style <- beer_ratings[which.max(beer_ratings$Avg_Review), ]
+print(highest_rated_style)
+```
+
+```{r}
+top_3_styles <- beer_ratings %>%
+  arrange(desc(Avg_Review)) %>%
+  head(3)
+
+print(top_3_styles)
+```
+
+
+
+Can we recommend other beers if someone picks a beer they like?
+
+```{r}
+library(class)
+
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+beer_data_norm <- as.data.frame(lapply(data[,c('Sweet', 'Sour', 'Salty')], normalize))
+
+user_beer <- beer_data_norm[1, ]
+
+beer_data_norm <- beer_data_norm[-1, ]
+
+distances <- dist(rbind(user_beer, beer_data_norm), method = "euclidean")
+closest_beers <- as.data.frame(sort(distances, index.return = TRUE))[1:5,2]
+
+recommended_beers <- data[closest_beers, ]
+print(recommended_beers)
+
+```
+
+
+
+
