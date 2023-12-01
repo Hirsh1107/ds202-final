@@ -22,7 +22,7 @@ data <- read.csv("./beer_profile_and_ratings.csv")
 head(data, 3)
 ```
 
-Which combination of mouth feel, taste, and flavor/aroma characteristics returns the highest ratings?
+Q: Which combination of mouth feel, taste, and flavor/aroma characteristics returns the highest ratings?
 
 ```{r}
 percents_flavor_data <- data.frame(data["review_overall"])
@@ -50,7 +50,7 @@ head(percents_flavor_data)
 
 ```{r}
 flavor_data <- data[order(-data$review_overall), ]
-flavor_data <- flavor_data[c("review_overall", "Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty" )]
+flavor_data <- flavor_data[c("review_overall", "Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]
 
 limited_flavor_data <- top_n(flavor_data, limit, review_overall)
 
@@ -81,4 +81,20 @@ limited_flavor_data %>%
         theme_minimal()
 ```
 
-Can we find what characteristics will likely cause a beer to be rated highly?
+Q: Can we find what characteristics will likely cause a beer to be rated highly?
+```{r}
+flavor_model <- lm(review_overall ~ Bitter + Sweet + Sour + Salty + Fruits + Hoppy + Spices + Malty, data = flavor_data)
+
+summary(flavor_model)
+```
+
+```{r}
+percent_flavor_model <- lm(review_overall ~ percents_flavor_data$'%Bitter' + percents_flavor_data$'%Sweet' + percents_flavor_data$'%Sour' + percents_flavor_data$'%Salty' + percents_flavor_data$'%Fruits' + percents_flavor_data$'%Hoppy' + percents_flavor_data$'%Spices' + percents_flavor_data$'%Malty', data = percents_flavor_data)
+
+summary(percent_flavor_model)
+```
+
+Predicting based on the models, if an alcohol will have a high 'overall_review'.
+```{r}
+
+```
