@@ -10,19 +10,16 @@ head(beers)
 ```
 6. Which Brewery has the highest rated beers?
 ```{r}
-highest_rated_by_brewery <- beers %>% 
+highest_rated_by_brewery <- function(name) {
+  return (beers %>% 
   group_by(Brewery) %>% 
   summarize(
-    review_overall = mean(review_overall),
-    review_aroma = mean(review_aroma),
-    review_appearance = mean(review_appearance),
-    review_palate = mean(review_palate),
-    review_taste = mean(review_taste),
-    num_reviews = sum(number_of_reviews)
+   rating = mean({{name}})
   ) %>%
-  arrange(desc(review_overall))
+  arrange(desc(rating)))
+}
 
-highest_rated_by_brewery
+highest_rated_by_brewery(review_overall)
 ```
 
 
