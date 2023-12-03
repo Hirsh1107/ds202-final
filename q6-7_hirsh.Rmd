@@ -16,10 +16,22 @@ highest_rated_by_brewery <- function(name) {
   summarize(
    rating = mean({{name}})
   ) %>%
-  arrange(desc(rating)))
+  arrange(desc(rating)) %>%
+  slice(1:10))
 }
 
-highest_rated_by_brewery(review_overall)
+bar_graph <- function(df) {
+  return ({{df}} %>%
+    mutate(Brewery = factor(Brewery, levels = unique(Brewery))) %>%
+    ggplot( aes(x=Brewery, y=rating)) +
+    geom_bar(stat="identity") +
+    coord_cartesian(ylim = c(min({{df}}$rating), max({{df}}$rating))) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  )
+}
+
+overall <- highest_rated_by_brewery(review_overall)
+bar_graph(overall)
 ```
 
 
