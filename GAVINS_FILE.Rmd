@@ -41,32 +41,24 @@ normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
-# Select the columns to be used for finding similar beers
-selected_columns <- c('Sweet', 'Sour', 'Salty', 'Bitter') # Add more columns if needed
+selected_columns <- c('Sweet', 'Sour', 'Salty', 'Bitter')
 
-# Create beer_data_norm
 beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
 
-# Find the row number of "Long Trail Ale"
-user_beer_row <- which(data$`Name` == "Long Trail Ale")
+user_beer_row <- which(data$`Name` == "Oatmeal Stout")
 
-# Check if "Long Trail Ale" exists in the data
 if(length(user_beer_row) == 0) {
   print("The beer 'Long Trail Ale' does not exist in the data.")
 } else {
-  # Get the characteristics of "Long Trail Ale"
   user_beer <- beer_data_norm[user_beer_row, ]
 
-  # Remove "Long Trail Ale" from the data
   beer_data_norm <- beer_data_norm[-user_beer_row, ]
 
-  # Use k-NN to find the 5 most similar beers
-  distances <- dist(rbind(user_beer, beer_data_norm), method = "euclidean")
-  #print(distances)
-  closest_beers <- order(distances)[1:5]
+  dist_matrix <- as.matrix(dist(rbind(user_beer, beer_data_norm), method = "euclidean"))
+  dist_vector <- as.vector(dist_matrix[1, -1])
+  closest_beers <- order(dist_vector)[1:5]
   print(closest_beers)
 
-  # Print the recommended beers
   recommended_beers <- data[closest_beers, ]
   print(recommended_beers)
 }
