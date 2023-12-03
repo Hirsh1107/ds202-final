@@ -6,7 +6,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ```{r}
 library(tidyverse)
 beers <- read.csv("beer_profile_and_ratings.csv")
-head(beers)
+beers
 ```
 6. Which Brewery has the highest rated beers?
 ```{r}
@@ -23,8 +23,10 @@ highest_rated_by_brewery(review_overall)
 ```
 
 
+
 7. How does the IBU score affect the overall score?
 ```{r}
-
+ggplot(beers, aes(x = Min.IBU, y = review_overall, color = factor(Min.IBU))) +
+  geom_point(size = 3, alpha = 0.7)
 ```
 
