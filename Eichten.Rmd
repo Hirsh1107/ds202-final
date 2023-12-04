@@ -88,13 +88,86 @@ flavor_model <- lm(review_overall ~ Bitter + Sweet + Sour + Salty + Fruits + Hop
 summary(flavor_model)
 ```
 
-```{r}
-percent_flavor_model <- lm(review_overall ~ percents_flavor_data$'%Bitter' + percents_flavor_data$'%Sweet' + percents_flavor_data$'%Sour' + percents_flavor_data$'%Salty' + percents_flavor_data$'%Fruits' + percents_flavor_data$'%Hoppy' + percents_flavor_data$'%Spices' + percents_flavor_data$'%Malty', data = percents_flavor_data)
+Predicting based on the models, if an alcohol will have a high 'overall_review'.
 
-summary(percent_flavor_model)
+First create data of prime flavors. A prime flavor is the best rated beer with 1 column the same then the rest evenly spread.
+```{r}
+prime_flavors <- data.frame(matrix(ncol = ncol(flavor_data), nrow = 0))
+colnames(prime_flavors) <- colnames(flavor_data)
+  prime_flavor <- data.frame(matrix(ncol = ncol(flavor_data), nrow = 1))
+prime_flavors$Flavor <- character()
+
+create_prime_flavor <- function(column) {
+  colnames(prime_flavor) <- colnames(flavor_data)
+  best_flavor <- flavor_data[which.max(flavor_data$review_overall),]
+
+  if (tolower(column) == "bitter") {
+    prime_flavor['Bitter'] <- best_flavor['Bitter']
+  } else {
+    prime_flavor['Bitter'] <- mean(flavor_data$'Bitter')
+  }
+  if (tolower(column) == "sweet") {
+    prime_flavor['Sweet'] <- best_flavor['Sweet']
+  } else {
+    prime_flavor['Sweet'] <- mean(flavor_data$'Sweet')
+  }
+  if (tolower(column) == "sour") {
+    prime_flavor['Sour'] <- best_flavor['Sour']
+  } else {
+    prime_flavor['Sour'] <- mean(flavor_data$'Sour')
+  }
+  if (tolower(column) == "salty") {
+    prime_flavor['Salty'] <- best_flavor['Salty']
+  } else {
+    prime_flavor['Salty'] <- mean(flavor_data$'Salty')
+  }
+  if (tolower(column) == "fruits") {
+    prime_flavor['Fruits'] <- best_flavor['Fruits']
+  } else {
+    prime_flavor['Fruits'] <- mean(flavor_data$'Fruits')
+  }
+  if (tolower(column) == "hoppy") {
+    prime_flavor['Hoppy'] <- best_flavor['Hoppy']
+  } else {
+    prime_flavor['Hoppy'] <- mean(flavor_data$'Hoppy')
+  }
+  if (tolower(column) == "spices") {
+    prime_flavor['Spices'] <- best_flavor['Spices']
+  } else {
+    prime_flavor['Spices'] <- mean(flavor_data$'Spices')
+  }
+  if (tolower(column) == "malty") {
+    prime_flavor['Malty'] <- best_flavor['Malty']
+  } else {
+    prime_flavor['Malty'] <- mean(flavor_data$'Malty')
+  }
+
+  return(prime_flavor)
+}
 ```
 
-Predicting based on the models, if an alcohol will have a high 'overall_review'.
 ```{r}
+flavors <- c('Bitter', 'Sweet', 'Sour', 'Salty', 'Fruits', 'Hoppy', 'Spices', 'Malty')
 
+for (flavor in flavors) {
+  new_prime_flavor <- create_prime_flavor(flavor)
+  new_prime_flavor$Flavor <- flavor
+  prime_flavors <- rbind(prime_flavors, new_prime_flavor)
+}
+
+head(prime_flavors, 8)
+```
+
+```{r}
+for (row in seq_len(nrow(prime_flavors))) {
+  predicted_score <- predict(flavor_model, newdata = prime_flavors[row, ])
+  prime_flavors[row, "review_overall"] <- predicted_score
+}
+head(prime_flavors, 8)
+```
+
+```{r}
+ggplot(prime_flavors, aes(x = Flavor, y = review_overall, fill = Flavor)) +
+        coord_cartesian(ylim=c(3,5)) +
+    geom_bar(stat = "identity")
 ```
