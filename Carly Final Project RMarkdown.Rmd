@@ -69,7 +69,7 @@ Interpretation of ABV vs Overall Rating - The scatter plot indicates that there 
 library(caret)
 
 # Selecting Characteristics
-features <- data[, c("Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty", "review_overall")]
+features <- data[, c("Sweet", "Bitter", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty", "review_overall")]
 
 # Split data into training and testing sets
 set.seed(123)
@@ -78,7 +78,7 @@ train_data <- features[training_rows, ]
 test_data <- features[-training_rows, ]
 
 # Linear Model
-model <- lm(review_overall ~ Sweet + Sour + Salty + Fruits + Hoppy + Spices + Malty, data = train_data)
+model <- lm(review_overall ~ Sweet + Bitter + Sour + Salty + Fruits + Hoppy + Spices + Malty, data = train_data)
 
 # Summarize Model
 summary(model)
@@ -92,54 +92,56 @@ print(paste("Root Mean Squared Error:", rmse))
 ```
 
 ### Interpretation of Linear Regression Statistics:
-All of the categories had an extremely low p-value (<0.05) which means that all of the characteristics are statistical significant when predicting the overall rating.
+All of the categories except salty had an extremely low p-value (<0.05) which means that 7 out of the 8 characteristics are statistical significant when predicting the overall review. I am going to rank them by significance and leave out salty due to the p-value.
 
-- 1. Malty (0.0038272): This characteristic has the highest positive influence on the overall ratings. Beers with higher malty flavors are more likely to be rated higher, suggesting a strong preference for maltiness.
+- 1. Bitter (0.0043145): Bitter had the highest positive influence on the overall review. This indicates that consumers generally lean towards the bitter flavor in beer.
 
-- 2. Fruits (0.0035599): Fruitiness is also a significant predictor. Beers that have a fruity character are generally rated more favorably.
+- 2. Fruits (0.0035742): Fruitiness is also a significant predictor. Beers that have a fruity character are generally reviewed more favorably.
 
-- 3. Spices (0.0019652): Spiciness is the third most influential factor. A greater presence of spices in beer is associated with higher ratings.
+- 3. Malty (0.0023470): This characteristic has a positive influence on the overall review. Beers with higher malty flavors are more likely to be rated higher, suggesting a strong preference for maltiness.
 
-- 4. Sour (0.0018759): Sourness has a positive influence on beer ratings. This suggests that beers with higher levels of sourness tend to be rated slightly more favorably.
+- 4. Spices (0.0020623): Spiciness is the fourth most influential factor. A greater presence of spices in beer is associated with higher reviews.
 
-- 5. Hoppy (0.0011240): Hoppiness has a positive influence. Beers with pronounced hop flavors tend to receive better ratings.
+- 5. Sour (0.0017782): Sourness has a positive influence on beer reviews. This suggests that beers with higher levels of sourness tend to be rated slightly more favorably.
 
-- 6. Sweet (-0.0016295): Sweetness shows a negative impact on ratings. Beers that are perceived as too sweet tend to be rated lower, indicating a possible aversion to excessive sweetness.
+- 6. Hoppy (-0.0011367): Hoppiness has a slightly negative influence. Beers with pronounced hop flavors tend to receive poorer reviews.
 
-- 7. Salty (-0.0100856): Saltiness has the smallest absolute coefficient and negatively impacts ratings. This suggests that salty beers are less preferred by consumers.
+- 7. Sweet (-0.0011201): Sweetness shows a negative impact on ratings. Beers that are perceived as too sweet tend to be rated lower, indicating a possible aversion to excessive sweetness.
 
-I have decided to dive deeper into three of the categories to get a better understanding of how they affect beer ratings. I am choosing 'Malty', 'Fruits', and 'Spices' as my characteristics to investigate further because they have the highest affect on overall ratings.
 
-### Malty
+I have decided to dive deeper into three of the categories to get a better understanding of how they affect beer ratings. I am choosing 'Bitter', 'Fruits', and 'Malty' as my characteristics to investigate further because they have the highest affect on overall ratings.
+
+### Bitter
 
 #### Summary Statistics
 ```{r}
-malty <- summary(data$Malty)
-malty
+bitter_stats <- summary(data$Bitter)
+bitter_stats
 ```
 
 #### Plots
 ```{r}
-ggplot(data, aes(x = Malty, y = review_overall)) +
+ggplot(data, aes(x = Bitter, y = review_overall)) +
   geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm", color = "blue") +
-  labs(title = "Relationship Between Malty Scores and Overall Ratings",
-       x = "Malty Score",
+  geom_smooth(method = "lm", color = "green") +
+  labs(title = "Relationship Between Bitter Scores and Overall Ratings",
+       x = "Bitter Score",
        y = "Overall Rating")
 ```
 
 #### Predicting Example
 ```{r}
-# Linear regression with malty as the predictor
-malty_regression <- lm(review_overall ~ Malty, data = data)
+# Linear regression with bitter as the predictor
+bitter_regression <- lm(review_overall ~ Bitter, data = data)
 
-# Predicting the rating for a beer with a malty score of 200 (very high)
-predicted_rating_malty <- predict(malty_regression, newdata = data.frame(Malty = 200))
-predicted_rating_malty
+# Predicting the rating for a beer with a bitter score of 120 (high)
+predicted_rating_bitter <- predict(bitter_regression, newdata = data.frame(Bitter = 120))
+predicted_rating_bitter
 
-#Predicting the rating for a beer with a malty score of 30 (very low).
-predicted_rating_malty_2 <- predict(malty_regression, newdata = data.frame(Malty = 30))
-predicted_rating_malty_2
+# Predicting the rating for a beer with a bitter score of 3 (low)
+predicted_rating_bitter_2 <- predict(bitter_regression, newdata = data.frame(Bitter = 3))
+predicted_rating_bitter_2
+
 ```
 
 ### Fruits
@@ -176,37 +178,34 @@ predicted_rating_fruits_2
 
 ```
 
-
-### Spices
+### Malty
 
 #### Summary Statistics
 ```{r}
-spices_stats <- summary(data$Spices)
-spices_stats
+malty <- summary(data$Malty)
+malty
 ```
 
 #### Plots
 ```{r}
-ggplot(data, aes(x = Spices, y = review_overall)) +
+ggplot(data, aes(x = Malty, y = review_overall)) +
   geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm", color = "green") +
-  labs(title = "Relationship Between Spices Scores and Overall Ratings",
-       x = "Spices Score",
+  geom_smooth(method = "lm", color = "blue") +
+  labs(title = "Relationship Between Malty Scores and Overall Ratings",
+       x = "Malty Score",
        y = "Overall Rating")
 ```
 
 #### Predicting Example
 ```{r}
-# Linear regression with spices as the predictor
-spices_regression <- lm(review_overall ~ Spices, data = data)
+# Linear regression with malty as the predictor
+malty_regression <- lm(review_overall ~ Malty, data = data)
 
-# Predicting the rating for a beer with a spices score of 120 (high)
-predicted_rating_spices <- predict(spices_regression, newdata = data.frame(Spices = 120))
-predicted_rating_spices
+# Predicting the rating for a beer with a malty score of 200 (very high)
+predicted_rating_malty <- predict(malty_regression, newdata = data.frame(Malty = 200))
+predicted_rating_malty
 
-# Predicting the rating for a beer with a spices score of 3 (low)
-predicted_rating_spices_2 <- predict(spices_regression, newdata = data.frame(Spices = 3))
-predicted_rating_spices_2
-
+#Predicting the rating for a beer with a malty score of 30 (very low).
+predicted_rating_malty_2 <- predict(malty_regression, newdata = data.frame(Malty = 30))
+predicted_rating_malty_2
 ```
-
