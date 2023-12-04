@@ -68,8 +68,22 @@ df_concat %>%
 
 7. How does the IBU score affect the overall score?
 ```{r}
-ggplot(beers, aes(x = Min.IBU, y = review_overall, color = factor(Min.IBU))) +
-  geom_point(size = 3, alpha = 0.7) +
-  labs(title = paste("IBU and Overall Review"))
+avg_score_bins <- beers %>%
+  mutate(
+    Avg.IBU = (Min.IBU + Max.IBU)/2,
+    IBU_bin = floor(Avg.IBU/10) * 10
+  ) %>%
+  group_by(IBU_bin) %>%
+  summarize(
+    avg_score = mean(review_overall)
+  )
+  
+avg_score_bins %>%
+  ggplot(aes(x = IBU_bin, y = avg_score, fill = factor(IBU_bin))) +
+  geom_bar(stat = "identity") +
+  coord_cartesian(ylim = c(min(avg_score_bins$avg_score), max(avg_score_bins$avg_score))) +
+  theme(legend.position = "none") +
+  labs(title = "IBU and Overall Score", x = "IBU", y = "Average Score")
+  
 ```
 
