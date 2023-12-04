@@ -10,28 +10,58 @@ beers
 ```
 6. Which Brewery has the highest rated beers?
 ```{r}
+#GET HIGHEST RATED BY BREWERY
 highest_rated_by_brewery <- function(name) {
   return (beers %>% 
   group_by(Brewery) %>% 
   summarize(
-   rating = mean({{name}})
+   Rating = mean({{name}})
   ) %>%
-  arrange(desc(rating)) %>%
-  slice(1:10))
+  arrange(desc(Rating)) %>%
+  slice(1:5))
 }
 
-bar_graph <- function(df) {
+#GET BAR GRAPH OF RANKING
+bar_graph <- function(df, name) {
   return ({{df}} %>%
     mutate(Brewery = factor(Brewery, levels = unique(Brewery))) %>%
-    ggplot(aes(x=Brewery, y=rating, fill=Brewery)) +
+    ggplot(aes(x=Brewery, y=Rating, fill=Brewery)) +
     geom_bar(stat="identity") +
-    coord_cartesian(ylim = c(min({{df}}$rating), max({{df}}$rating))) +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none")
+    coord_cartesian(ylim = c(min({{df}}$Rating), max({{df}}$Rating))) +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1), legend.position = "none") +
+    labs(title = paste("Top 5 Highest Rated by Brewery:", name))
   )
 }
 
+#GET AND GRAPH ALL RANKINGS
 overall <- highest_rated_by_brewery(review_overall)
-bar_graph(overall)
+aroma <- highest_rated_by_brewery(review_aroma)
+appearance <- highest_rated_by_brewery(review_appearance)
+palate <- highest_rated_by_brewery(review_palate)
+taste <- highest_rated_by_brewery(review_taste)
+bar_graph(overall, "Overall")
+bar_graph(aroma, "Aroma")
+bar_graph(appearance, "Appearance")
+bar_graph(palate, "Palate")
+bar_graph(taste, "Taste")
+
+#CONCATENATE ALL RANKINGS
+df_list <- list(overall, aroma, appearance, palate, taste)
+df_concat <- Reduce(function(x, y) merge(x, y, all=TRUE), df_list) 
+df_concat <- df_concat %>% 
+  group_by(Brewery) %>%
+  summarize(
+    Count = n()
+  ) %>%
+  arrange(Count)
+df_concat %>% 
+    mutate(Brewery = factor(Brewery, levels = unique(Brewery))) %>%
+    ggplot(aes(x=Brewery, y=Count, fill=Brewery)) +
+    geom_bar(stat="identity") +
+    coord_flip() +
+    theme(legend.position = "none") +
+    labs(title = "Top 5 Ranking: Frequency by Brewery")
+
 ```
 
 
@@ -39,6 +69,7 @@ bar_graph(overall)
 7. How does the IBU score affect the overall score?
 ```{r}
 ggplot(beers, aes(x = Min.IBU, y = review_overall, color = factor(Min.IBU))) +
-  geom_point(size = 3, alpha = 0.7)
+  geom_point(size = 3, alpha = 0.7) +
+  labs(title = paste("IBU and Overall Review"))
 ```
 
