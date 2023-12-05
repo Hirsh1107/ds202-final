@@ -147,7 +147,7 @@ create_prime_flavor <- function(column) {
 ```
 
 ```{r}
-flavors <- c('Bitter', 'Sweet', 'Sour', 'Salty', 'Fruits', 'Hoppy', 'Spices', 'Malty')
+flavors <- c('Bitter', 'Sweet', 'Sour', 'Salty', 'Fruits', 'Hoppy', 'Spices', 'Malty', 'Base')
 
 for (flavor in flavors) {
   new_prime_flavor <- create_prime_flavor(flavor)
@@ -155,7 +155,7 @@ for (flavor in flavors) {
   prime_flavors <- rbind(prime_flavors, new_prime_flavor)
 }
 
-head(prime_flavors, 8)
+head(prime_flavors, 9)
 ```
 
 ```{r}
