@@ -11,7 +11,9 @@ knitr::opts_chunk$set(echo = TRUE)
 
 What are the most popular beer styles?
 ```{r}
+# Read in data and sort
 library(dplyr)
+library(ggplot2)
 data <- read.csv("beer_profile_and_ratings.csv")
 
 beer_ratings <- data %>%
@@ -19,41 +21,210 @@ beer_ratings <- data %>%
   summarise(Avg_Review = mean(review_overall, na.rm = TRUE))
 
 highest_rated_style <- beer_ratings[which.max(beer_ratings$Avg_Review), ]
+lowest_rated_style <- beer_ratings[which.min(beer_ratings$Avg_Review), ]
 print(highest_rated_style)
+print(lowest_rated_style)
 ```
 
 ```{r}
-top_3_styles <- beer_ratings %>%
+# graph for 15 highest rated styles
+top_15_styles <- beer_ratings %>%
   arrange(desc(Avg_Review)) %>%
-  head(3)
-
-print(top_3_styles)
+  head(15)
+print(top_15_styles)
+ggplot(top_15_styles, aes(x=reorder(Style, Avg_Review), y=Avg_Review, fill=Style)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  labs(x="Beer Style", y="Average Review", title="Top 15 Beer Styles by Average Review", fill="Beer Style") +
+  theme_minimal() +
+  theme(legend.position = "none")
 ```
 
+```{r}
+# graph for 15 lowest rated styles
+bottom_15_styles <- beer_ratings %>%
+  arrange(Avg_Review) %>%
+  head(15)
+print(bottom_15_styles)
+ggplot(bottom_15_styles, aes(x=reorder(Style, -Avg_Review), y=Avg_Review, fill=Style)) +
+  geom_bar(stat="identity") +
+  coord_flip() +
+  labs(x="Beer Style", y="Average Review", title="Bottom 15 Beer Styles by Average Review", fill="Beer Style") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
 
 
 Can we recommend other beers if someone picks a beer they like?
 
 ```{r}
-library(class)
-
 normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
-beer_data_norm <- as.data.frame(lapply(data[,c('Sweet', 'Sour', 'Salty')], normalize))
+#selected_columns <- c('Sweet', 'Sour', 'Salty', 'Bitter')
+selected_columns <- c('Sweet', 'Sour')
 
-user_beer <- beer_data_norm[1, ]
+beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
 
-beer_data_norm <- beer_data_norm[-1, ]
+user_beer_row <- which(data$`Name` == "Long Trail Ale")
 
-distances <- dist(rbind(user_beer, beer_data_norm), method = "euclidean")
-closest_beers <- as.data.frame(sort(distances, index.return = TRUE))[1:5,2]
+if(length(user_beer_row) == 0) {
+  print("The beer 'Long Trail Ale' does not exist in the data.")
+} else {
+  user_beer <- beer_data_norm[user_beer_row, ]
 
-recommended_beers <- data[closest_beers, ]
-print(recommended_beers)
+  beer_data_norm <- beer_data_norm[-user_beer_row, ]
+
+  dist_matrix <- as.matrix(dist(rbind(user_beer, beer_data_norm), method = "euclidean"))
+  dist_vector <- as.vector(dist_matrix[1, -1])
+  closest_beers <- order(dist_vector)[1:5]
+  
+  print(dist_vector[closest_beers])
+  print(beer_data_norm[closest_beers, ])
+  print(user_beer)
+
+  
+  recommended_beers <- data[closest_beers, ]
+  print(recommended_beers)
+}
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+data <- read.csv("beer_profile_and_ratings.csv")
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+selected_columns <- c('Sweet', 'Sour')
+beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
+user_beer_row <- which(data$`Name` == "Long Trail Ale")
+user_beer <- beer_data_norm[user_beer_row, ]
+
+dist_matrix <- as.matrix(dist(rbind(user_beer, beer_data_norm), method = "euclidean"))
+dist_vector <- as.vector(dist_matrix[1, -1])
+beer_data_norm$Distance <- c(dist_vector[1:(user_beer_row-2)], NA, dist_vector[user_beer_row:(length(dist_vector))])
+
+ggplot(beer_data_norm, aes(x=Sweet, y=Sour, color=Distance)) +
+  geom_point() +
+  scale_color_gradient(low = "blue", high = "red") +
+  labs(x="Sweet", y="Sour", color="Distance to Long Trail Ale") +
+  theme_minimal()
 
 ```
+
+```{r}
+library(scatterplot3d)
+library(dplyr)
+library(ggplot2)
+
+# Read the data
+data <- read.csv("beer_profile_and_ratings.csv")
+
+# Normalize the data
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+selected_columns <- c('Sweet', 'Sour', 'Bitter')
+beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
+
+# Select a beer
+user_beer_row <- which(data$`Name` == "Long Trail Ale")
+user_beer <- beer_data_norm[user_beer_row, ]
+
+# Remove the user's beer from the data
+beer_data_norm <- beer_data_norm[-user_beer_row, ]
+
+# Calculate the Euclidean distances
+dist_matrix <- as.matrix(dist(rbind(user_beer, beer_data_norm), method = "euclidean"))
+dist_vector <- as.vector(dist_matrix[1, -1])
+
+# Add the distances to the data frame
+beer_data_norm$Distance <- c(dist_vector[1:(user_beer_row-1)], dist_vector[user_beer_row:length(dist_vector)])
+
+# Create a 3D scatterplot
+scatterplot3d(beer_data_norm$Sweet, beer_data_norm$Sour, beer_data_norm$Bitter, color=rainbow(length(beer_data_norm$Distance))[rank(beer_data_norm$Distance)], xlab="Sweet", ylab="Sour", zlab="Bitter")
+
+```
+
+
+```{r}
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+selected_columns <- c('Bitter','Sweet','Sour','Salty','Fruits','Hoppy','Spices','Malty')
+
+beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
+
+user_beer_row <- which(data$`Name` == "Long Trail Ale")
+
+if(length(user_beer_row) == 0) {
+  print("The beer 'Long Trail Ale' does not exist in the data.")
+} else {
+  user_beer <- beer_data_norm[user_beer_row, ]
+
+  beer_data_norm <- beer_data_norm[-user_beer_row, ]
+
+  dist_matrix <- as.matrix(dist(rbind(user_beer, beer_data_norm), method = "euclidean"))
+  dist_vector <- as.vector(dist_matrix[1, -1])
+  closest_beers <- order(dist_vector)[1:5]
+  
+  result <- data.frame(Name = c(data[user_beer_row, "Name"], data[closest_beers, "Name"]),
+                       beer_data_norm[c(user_beer_row, closest_beers), ],
+                       Distance = c(NA, dist_vector[closest_beers]))
+  
+  # Print the result
+  print(result)
+}
+```
+
+
+```{r}
+# Load necessary library
+library(class)
+
+# Normalize the data
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+selected_columns <- c('Bitter','Sweet','Sour','Salty','Fruits','Hoppy','Spices','Malty')
+beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
+
+# Select a beer
+user_beer_row <- which(data$`Name` == "Long Trail Ale")
+user_beer <- beer_data_norm[user_beer_row, ]
+
+# Remove the user's beer from the data
+beer_data_norm <- beer_data_norm[-user_beer_row, ]
+data <- data[-user_beer_row, ]
+
+# Split the data into training and test sets
+set.seed(123)  # for reproducibility
+train_rows <- sample(1:nrow(beer_data_norm), nrow(beer_data_norm)*0.7)
+train_set <- beer_data_norm[train_rows, ]
+test_set <- beer_data_norm[-train_rows, ]
+
+# Run the KNN model
+knn_result <- knn(train=train_set, test=user_beer, cl=data$Style[train_rows], k=5)
+
+# Print the results
+print(knn_result)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
