@@ -62,7 +62,6 @@ normalize <- function(x) {
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
-#selected_columns <- c('Sweet', 'Sour', 'Salty', 'Bitter')
 selected_columns <- c('Sweet', 'Sour')
 
 beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
@@ -175,14 +174,12 @@ if(length(user_beer_row) == 0) {
                        beer_data_norm[c(user_beer_row, closest_beers), ],
                        Distance = c(NA, dist_vector[closest_beers]))
   
-  # Print the result
   print(result)
 }
 ```
 
 
 ```{r}
-# Load necessary library
 library(class)
 
 # Normalize the data
@@ -192,7 +189,6 @@ normalize <- function(x) {
 selected_columns <- c('Bitter','Sweet','Sour','Salty','Fruits','Hoppy','Spices','Malty')
 beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
 
-# Select a beer
 user_beer_row <- which(data$`Name` == "Long Trail Ale")
 user_beer <- beer_data_norm[user_beer_row, ]
 

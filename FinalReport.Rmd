@@ -9,6 +9,12 @@ library(dplyr)
 library(ggplot2)
 library(knitr)
 library(kableExtra)
+library(caret)
+library(readxl)
+library(viridis)
+library(tidyr)
+library(scatterplot3d)
+library(class)
 data <- read.csv("./beer_profile_and_ratings.csv")
 ```
 
@@ -67,9 +73,6 @@ Interpretation of ABV vs Overall Rating - The scatter plot indicates that there 
 
 #### Linear Regression Model
 ```{r}
-library(caret)
-
-# Selecting Characteristics
 features <- data[, c("Sweet", "Bitter", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty", "review_overall")]
 
 # Split data into training and testing sets
@@ -81,7 +84,6 @@ test_data <- features[-training_rows, ]
 # Linear Model
 model <- lm(review_overall ~ Sweet + Bitter + Sour + Salty + Fruits + Hoppy + Spices + Malty, data = train_data)
 
-# Summarize Model
 summary(model)
 
 # Make predictions on the test set
@@ -285,4 +287,20 @@ characteristicsRank <- characteristicsRank %>% select(Characteristic, Frequency)
 
 kable(characteristicsRank, caption = "Characteristic Frequencies", col.names = c("Characteristic", "Frequency"), format = "html", border = 2) %>% kable_styling()
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
