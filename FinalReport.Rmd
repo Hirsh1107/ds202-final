@@ -68,6 +68,72 @@ plot(data$ABV, data$review_overall, main="Scatter Plot of ABV vs Overall Ratings
 
 Interpretation of ABV vs Overall Rating - The scatter plot indicates that there is very little to no evidence to suggest a clear-cut influence of alcohol content on beer ratings. Other characteristics are likely more indicative of the overall ratings of the beer. 
 
+### Which Brewery has the highest rated beers?
+```{r echo=FALSE}
+highest_rated_by_brewery <- function(name, displayName) {
+  result <- data %>% 
+  group_by(Brewery) %>% 
+  summarize(
+   Rating = mean({{name}})
+  ) %>%
+  arrange(desc(Rating)) %>%
+  slice(1:5)
+  print(result)
+  return(result)
+}
+```
+
+#### Top 5 Breweries Overall
+```{r echo=FALSE}
+overall <- highest_rated_by_brewery(review_overall, "Overall")
+```
+
+#### Top 5 Breweries by Aroma
+```{r echo=FALSE}
+aroma <- highest_rated_by_brewery(review_aroma, "Aroma")
+```
+
+#### Top 5 Breweries by Appearance
+```{r echo=FALSE}
+appearance <- highest_rated_by_brewery(review_appearance, "Appearance")
+```
+
+#### Top 5 Breweries by Palate
+```{r echo=FALSE}
+palate <- highest_rated_by_brewery(review_palate, "Palate")
+```
+
+#### Top 5 Breweries by Taste
+```{r echo=FALSE}
+taste <- highest_rated_by_brewery(review_taste, "Taste")
+```
+
+
+While the overall rating gives us a general overview, viewing the frequency of top five rankings by brewery can produce even more valuable insights into the overall quality of a given brewery
+
+```{r echo=FALSE}
+df_list <- list(overall, aroma, appearance, palate, taste)
+df_concat <- Reduce(
+  function(x, y) 
+  merge(x, y, all=TRUE),
+  df_list)
+df_concat %>% 
+  group_by(Brewery) %>%
+  summarize(
+    Count = n()
+  ) %>%
+  arrange(Count) %>% 
+    mutate(Brewery = factor(Brewery, levels = unique(Brewery))) %>%
+    ggplot(aes(x=Brewery, y=Count)) +
+    geom_bar(stat="identity") +
+    coord_flip() +
+    theme(legend.position = "none") +
+    labs(title = "Top 5 Ranking: Frequency by Brewery")
+```
+
+We notice how a few breweries in the overall ranking do not score within the top 5 by any other metrics: Helios Distillery Co. and  Brauerei Zehendner GmbH. We also notice the relative dominance of breweries The Alchemist and Brouwerij Westvleteren, which ranked 3rd and 5th on the overall ranking, respectively.
+
+### How does the IBU score affect the overall score?
 
 ### Can we predict the rating of a beer based on its characteristics?
 
@@ -216,7 +282,7 @@ predicted_rating_malty_2
 
 
 
-Which beers have the highest aroma, appearance, palate, and taste ratings?
+### Which beers have the highest aroma, appearance, palate, and taste ratings?
 ```{r echo=FALSE}
 # top ten beers from each category
 aromaTop <- data[c("Name", "review_aroma")]
@@ -253,7 +319,7 @@ kable(palateTop, caption = "Top 10 Palate Rated Beers", col.names = c("Name", "P
 kable(tasteTop, caption = "Top 10 Taste Rated Beers", col.names = c("Name", "Taste Rating"), format = "html", border = 2) %>% kable_styling()
 ```
 
-What are the most common characteristics of beer?
+### What are the most common characteristics of beer?
 
 The following characteristics are defined by word counts found in up to 25 reviews of each beer. The assumption is that people writing reviews are more than likely describing what they do experience rather than what they do not. (Refer to the file Beer Descriptors Simplified to see the list of words that are used to calculate the values contained in each of the feature columns below)
 
