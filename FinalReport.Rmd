@@ -135,6 +135,31 @@ We notice how a few breweries in the overall ranking do not score within the top
 
 ### How does the IBU score affect the overall score?
 
+#### What is IBU?
+IBU stands for International Bitterness Unit, and it is a scale used to quantify the bitterness of beer. The IBU scale measures the amount of bittering compounds, primarily iso-alpha acids, derived from hops in the beer. These compounds contribute to the bitterness of the beer.
+
+The IBU scale typically ranges from 0 to 100 or more, with higher values indicating a more bitter taste.
+
+```{r echo=FALSE}
+avg_score_bins <- data %>%
+  mutate(
+    Avg.IBU = (Min.IBU + Max.IBU)/2,
+    IBU_bin = floor(Avg.IBU/10) * 10
+  ) %>%
+  group_by(IBU_bin) %>%
+  summarize(
+    avg_score = mean(review_overall)
+  )
+  
+avg_score_bins %>%
+  ggplot(aes(x = IBU_bin, y = avg_score)) +
+  geom_bar(stat = "identity") +
+  coord_cartesian(ylim = c(min(avg_score_bins$avg_score), max(avg_score_bins$avg_score))) +
+  labs(title = "IBU and Overall Score", x = "IBU", y = "Average Score")
+```
+
+A histogram plotting the average rating per IBU bin demonstrates that there exists an "ideal" and "least ideal" IBU range, those being 60-69 and 10-19, respectively. The graph also indicates a positive correlation between IBU and average score, in general.
+
 ### Can we predict the rating of a beer based on its characteristics?
 
 #### Linear Regression Model
