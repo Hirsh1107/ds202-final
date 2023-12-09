@@ -11,7 +11,6 @@ knitr::opts_chunk$set(echo = TRUE)
 
 What are the most popular beer styles?
 ```{r}
-# Read in data and sort
 library(dplyr)
 library(ggplot2)
 data <- read.csv("beer_profile_and_ratings.csv")
@@ -177,7 +176,6 @@ if(length(user_beer_row) == 0) {
   print(result)
 }
 ```
-
 
 ```{r}
 library(class)

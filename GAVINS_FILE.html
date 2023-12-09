@@ -359,8 +359,7 @@ Questions</h1>
 
 
 <p>What are the most popular beer styles?</p>
-<pre class="r"><code># Read in data and sort
-library(dplyr)</code></pre>
+<pre class="r"><code>library(dplyr)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;dplyr&#39;</code></pre>
 <pre><code>## The following objects are masked from &#39;package:stats&#39;:
@@ -453,7 +452,6 @@ print(bottom_15_styles)</code></pre>
   return ((x - min(x)) / (max(x) - min(x)))
 }
 
-#selected_columns &lt;- c(&#39;Sweet&#39;, &#39;Sour&#39;, &#39;Salty&#39;, &#39;Bitter&#39;)
 selected_columns &lt;- c(&#39;Sweet&#39;, &#39;Sour&#39;)
 
 beer_data_norm &lt;- as.data.frame(lapply(data[, selected_columns], normalize))
@@ -607,7 +605,6 @@ if(length(user_beer_row) == 0) {
                        beer_data_norm[c(user_beer_row, closest_beers), ],
                        Distance = c(NA, dist_vector[closest_beers]))
   
-  # Print the result
   print(result)
 }</code></pre>
 <pre><code>##                        Name    Bitter     Sweet       Sour      Salty
@@ -624,8 +621,7 @@ if(length(user_beer_row) == 0) {
 ## 1093 0.06857143 0.2965116 0.021739130 0.2970711 0.05104633
 ## 1282 0.08571429 0.3372093 0.021739130 0.2468619 0.05683235
 ## 1107 0.08000000 0.2965116 0.005434783 0.2050209 0.08015352</code></pre>
-<pre class="r"><code># Load necessary library
-library(class)
+<pre class="r"><code>library(class)
 
 # Normalize the data
 normalize &lt;- function(x) {
@@ -634,7 +630,6 @@ normalize &lt;- function(x) {
 selected_columns &lt;- c(&#39;Bitter&#39;,&#39;Sweet&#39;,&#39;Sour&#39;,&#39;Salty&#39;,&#39;Fruits&#39;,&#39;Hoppy&#39;,&#39;Spices&#39;,&#39;Malty&#39;)
 beer_data_norm &lt;- as.data.frame(lapply(data[, selected_columns], normalize))
 
-# Select a beer
 user_beer_row &lt;- which(data$`Name` == &quot;Long Trail Ale&quot;)
 user_beer &lt;- beer_data_norm[user_beer_row, ]
 

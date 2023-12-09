@@ -1,7 +1,7 @@
 ---
 title: 'The Beer Necessities'
 author: "Team: Carly Seeck, Drew Hirsh,  Eric Hedgren, Henry Eichten, Gavin Fisher"
-date: "11/27/2023"
+date: "12/08/2023"
 output: html_document
 ---
 ```{r include=FALSE}
@@ -381,17 +381,314 @@ kable(characteristicsRank, caption = "Characteristic Frequencies", col.names = c
 
 
 
+Q: Which combination of mouth feel, taste, and flavor/aroma characteristics returns the highest ratings?
+
+```{r echo=FALSE}
+percents_flavor_data <- data.frame(data["review_overall"])
+
+percents_flavor_data$'%Bitter' <- round(data$Bitter / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Sweet' <- round(data$Sweet / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Sour' <- round(data$Sour / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Salty' <- round(data$Salty / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Fruits' <- round(data$Fruits / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Hoppy' <- round(data$Hoppy / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Spices' <- round(data$Spices / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+percents_flavor_data$'%Malty' <- round(data$Malty / rowSums(data[, c("Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]), 5)
+
+limit <- 100
+limited_percents_flavor_data <- top_n(percents_flavor_data, limit, review_overall)
+
+head(percents_flavor_data)
+```
+
+```{r echo=FALSE}
+flavor_data <- data[order(-data$review_overall), ]
+flavor_data <- flavor_data[c("review_overall", "Bitter", "Sweet", "Sour", "Salty", "Fruits", "Hoppy", "Spices", "Malty")]
+
+limited_flavor_data <- top_n(flavor_data, limit, review_overall)
+
+top_10 <- top_n(flavor_data, 10, review_overall)
+
+print(top_10)
+```
+
+Data visualized by percent of variable of sum of all variables by raw values.
+```{r echo=FALSE}
+limited_percents_flavor_data <- limited_percents_flavor_data[order(limited_percents_flavor_data$review_overall), ]
+
+limited_percents_flavor_data %>%
+    tidyr::gather(variable, value, -review_overall) %>%
+    ggplot(aes(x = variable, y = value, fill = variable)) +
+        geom_boxplot() +
+        theme_minimal()
+```
+
+Data visualized by raw values.
+```{r echo=FALSE}
+limited_flavor_data <- limited_flavor_data[order(limited_flavor_data$review_overall), ]
+
+limited_flavor_data %>%
+    tidyr::gather(variable, value, -review_overall) %>%
+    ggplot(aes(x = variable, y = value, fill = variable)) +
+        geom_boxplot() +
+        theme_minimal()
+```
+
+Q: Can we find what characteristics will likely cause a beer to be rated highly?
+```{r echo=FALSE}
+flavor_model <- lm(review_overall ~ Bitter + Sweet + Sour + Salty + Fruits + Hoppy + Spices + Malty, data = flavor_data)
+
+summary(flavor_model)
+```
+
+Predicting based on the models, if an alcohol will have a high 'overall_review'.
+
+First create data of prime flavors. A prime flavor is the best rated beer with 1 column the same then the rest evenly spread.
+```{r echo=FALSE}
+prime_flavors <- data.frame(matrix(ncol = ncol(flavor_data), nrow = 0))
+colnames(prime_flavors) <- colnames(flavor_data)
+  prime_flavor <- data.frame(matrix(ncol = ncol(flavor_data), nrow = 1))
+prime_flavors$Flavor <- character()
+
+create_prime_flavor <- function(column) {
+  colnames(prime_flavor) <- colnames(flavor_data)
+  best_flavor <- flavor_data[which.max(flavor_data$review_overall),]
+
+  if (tolower(column) == "bitter") {
+    prime_flavor['Bitter'] <- best_flavor['Bitter']
+  } else {
+    prime_flavor['Bitter'] <- mean(flavor_data$'Bitter')
+  }
+  if (tolower(column) == "sweet") {
+    prime_flavor['Sweet'] <- best_flavor['Sweet']
+  } else {
+    prime_flavor['Sweet'] <- mean(flavor_data$'Sweet')
+  }
+  if (tolower(column) == "sour") {
+    prime_flavor['Sour'] <- best_flavor['Sour']
+  } else {
+    prime_flavor['Sour'] <- mean(flavor_data$'Sour')
+  }
+  if (tolower(column) == "salty") {
+    prime_flavor['Salty'] <- best_flavor['Salty']
+  } else {
+    prime_flavor['Salty'] <- mean(flavor_data$'Salty')
+  }
+  if (tolower(column) == "fruits") {
+    prime_flavor['Fruits'] <- best_flavor['Fruits']
+  } else {
+    prime_flavor['Fruits'] <- mean(flavor_data$'Fruits')
+  }
+  if (tolower(column) == "hoppy") {
+    prime_flavor['Hoppy'] <- best_flavor['Hoppy']
+  } else {
+    prime_flavor['Hoppy'] <- mean(flavor_data$'Hoppy')
+  }
+  if (tolower(column) == "spices") {
+    prime_flavor['Spices'] <- best_flavor['Spices']
+  } else {
+    prime_flavor['Spices'] <- mean(flavor_data$'Spices')
+  }
+  if (tolower(column) == "malty") {
+    prime_flavor['Malty'] <- best_flavor['Malty']
+  } else {
+    prime_flavor['Malty'] <- mean(flavor_data$'Malty')
+  }
+
+  return(prime_flavor)
+}
+```
+
+```{r echo=FALSE}
+flavors <- c('Bitter', 'Sweet', 'Sour', 'Salty', 'Fruits', 'Hoppy', 'Spices', 'Malty', 'Base')
+
+for (flavor in flavors) {
+  new_prime_flavor <- create_prime_flavor(flavor)
+  new_prime_flavor$Flavor <- flavor
+  prime_flavors <- rbind(prime_flavors, new_prime_flavor)
+}
+
+head(prime_flavors, 9)
+```
+
+```{r echo=FALSE}
+for (row in seq_len(nrow(prime_flavors))) {
+  predicted_score <- predict(flavor_model, newdata = prime_flavors[row, ])
+  prime_flavors[row, "review_overall"] <- predicted_score
+}
+head(prime_flavors, 8)
+```
+
+```{r echo=FALSE}
+ggplot(prime_flavors, aes(x = Flavor, y = review_overall, fill = Flavor)) +
+        coord_cartesian(ylim=c(3,5)) +
+    geom_bar(stat = "identity")
+```
 
 
 
 
+What are the most popular beer styles?
+```{r echo=FALSE}
+data <- read.csv("beer_profile_and_ratings.csv")
+
+beer_ratings <- data %>%
+  group_by(Style) %>%
+  summarise(Avg_Review = mean(review_overall, na.rm = TRUE))
+
+highest_rated_style <- beer_ratings[which.max(beer_ratings$Avg_Review), ]
+lowest_rated_style <- beer_ratings[which.min(beer_ratings$Avg_Review), ]
+print(highest_rated_style)
+print(lowest_rated_style)
+```
+
+```{r echo=FALSE}
+# graph for 15 highest rated styles
+top_15_styles <- beer_ratings %>%
+  arrange(desc(Avg_Review)) %>%
+  head(15)
+print(top_15_styles)
+ggplot(top_15_styles, aes(x=reorder(Style, Avg_Review), y=Avg_Review, fill=Style)) +
+  geom_bar(stat="identity", fill="gray") +
+  coord_flip() +
+  labs(x="Beer Style", y="Average Review", title="Top 15 Beer Styles by Average Review") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r echo=FALSE}
+# graph for 15 lowest rated styles
+bottom_15_styles <- beer_ratings %>%
+  arrange(Avg_Review) %>%
+  head(15)
+print(bottom_15_styles)
+ggplot(bottom_15_styles, aes(x=reorder(Style, -Avg_Review), y=Avg_Review, fill=Style)) +
+  geom_bar(stat="identity", fill="grey") +
+  coord_flip() +
+  labs(x="Beer Style", y="Average Review", title="Bottom 15 Beer Styles by Average Review") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
 
 
+Can we recommend other beers if someone picks a beer they like?
 
+```{r echo=FALSE}
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
 
+selected_columns <- c('Sweet', 'Sour')
 
+beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
 
+user_beer_row <- which(data$`Name` == "Long Trail Ale")
 
+if(length(user_beer_row) == 0) {
+  print("The beer 'Long Trail Ale' does not exist in the data.")
+} else {
+  user_beer <- beer_data_norm[user_beer_row, ]
 
+  beer_data_norm <- beer_data_norm[-user_beer_row, ]
 
+  dist_matrix <- as.matrix(dist(rbind(user_beer, beer_data_norm), method = "euclidean"))
+  dist_vector <- as.vector(dist_matrix[1, -1])
+  closest_beers <- order(dist_vector)[1:5]
+  
+  print(dist_vector[closest_beers])
+  print(beer_data_norm[closest_beers, ])
+  print(user_beer)
+
+  
+  recommended_beers <- data[closest_beers, ]
+  print(recommended_beers)
+}
+```
+
+```{r echo=FALSE}
+data <- read.csv("beer_profile_and_ratings.csv")
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+selected_columns <- c('Sweet', 'Sour')
+beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
+user_beer_row <- which(data$`Name` == "Long Trail Ale")
+user_beer <- beer_data_norm[user_beer_row, ]
+
+dist_matrix <- as.matrix(dist(rbind(user_beer, beer_data_norm), method = "euclidean"))
+dist_vector <- as.vector(dist_matrix[1, -1])
+beer_data_norm$Distance <- c(dist_vector[1:(user_beer_row-2)], NA, dist_vector[user_beer_row:(length(dist_vector))])
+
+ggplot(beer_data_norm, aes(x=Sweet, y=Sour, color=Distance)) +
+  geom_point() +
+  scale_color_gradient(low = "blue", high = "red") +
+  labs(x="Sweet", y="Sour", color="Distance to Long Trail Ale") +
+  theme_minimal()
+
+```
+
+```{r echo=FALSE}
+data <- read.csv("beer_profile_and_ratings.csv")
+
+# Normalize the data
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+selected_columns <- c('Sweet', 'Sour', 'Bitter')
+beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
+
+# Select a beer
+user_beer_row <- which(data$`Name` == "Long Trail Ale")
+user_beer <- beer_data_norm[user_beer_row, ]
+
+# Remove the user's beer from the data
+beer_data_norm <- beer_data_norm[-user_beer_row, ]
+
+# Calculate the Euclidean distances
+dist_matrix <- as.matrix(dist(rbind(user_beer, beer_data_norm), method = "euclidean"))
+dist_vector <- as.vector(dist_matrix[1, -1])
+
+# Add the distances to the data frame
+beer_data_norm$Distance <- c(dist_vector[1:(user_beer_row-1)], dist_vector[user_beer_row:length(dist_vector)])
+
+# Create a 3D scatterplot
+scatterplot3d(beer_data_norm$Sweet, beer_data_norm$Sour, beer_data_norm$Bitter, color=rainbow(length(beer_data_norm$Distance))[rank(beer_data_norm$Distance)], xlab="Sweet", ylab="Sour", zlab="Bitter")
+```
+
+```{r echo=FALSE}
+normalize <- function(x) {
+  return ((x - min(x)) / (max(x) - min(x)))
+}
+
+selected_columns <- c('Bitter','Sweet','Sour','Salty','Fruits','Hoppy','Spices','Malty')
+
+beer_data_norm <- as.data.frame(lapply(data[, selected_columns], normalize))
+
+user_beer_row <- which(data$`Name` == "Long Trail Ale")
+
+if(length(user_beer_row) == 0) {
+  print("The beer 'Long Trail Ale' does not exist in the data.")
+} else {
+  user_beer <- beer_data_norm[user_beer_row, ]
+
+  beer_data_norm <- beer_data_norm[-user_beer_row, ]
+
+  dist_matrix <- as.matrix(dist(rbind(user_beer, beer_data_norm), method = "euclidean"))
+  dist_vector <- as.vector(dist_matrix[1, -1])
+  closest_beers <- order(dist_vector)[1:5]
+  
+  result <- data.frame(Name = c(data[user_beer_row, "Name"], data[closest_beers, "Name"]),
+                       beer_data_norm[c(user_beer_row, closest_beers), ],
+                       Distance = c(NA, dist_vector[closest_beers]))
+  
+  print(result)
+}
+```
 
