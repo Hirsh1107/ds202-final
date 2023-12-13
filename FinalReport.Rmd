@@ -542,9 +542,6 @@ ggplot(prime_flavors, aes(x = Flavor, y = review_overall, fill = Flavor)) +
     geom_bar(stat = "identity")
 ```
 
-
-
-
 What are the most popular beer styles?
 ```{r echo=FALSE}
 data <- read.csv("beer_profile_and_ratings.csv")
@@ -559,6 +556,7 @@ print(highest_rated_style)
 print(lowest_rated_style)
 ```
 
+Graph for 15 highest rated styles
 ```{r echo=FALSE}
 # graph for 15 highest rated styles
 top_15_styles <- beer_ratings %>%
@@ -573,6 +571,7 @@ ggplot(top_15_styles, aes(x=reorder(Style, Avg_Review), y=Avg_Review, fill=Style
   theme(legend.position = "none")
 ```
 
+Graph for 15 lowest rated styles
 ```{r echo=FALSE}
 # graph for 15 lowest rated styles
 bottom_15_styles <- beer_ratings %>%
