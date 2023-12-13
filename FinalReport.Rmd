@@ -15,6 +15,7 @@ library(viridis)
 library(tidyr)
 library(scatterplot3d)
 library(class)
+
 data <- read.csv("./beer_profile_and_ratings.csv")
 ```
 
@@ -420,7 +421,11 @@ print(top_10)
 ```
 
 Data visualized by percent of variable of sum of all variables by raw values.
-```{r echo=FALSE}
+
+Reading the boxes as heat maps it can be understood how the score of a drinks overall_review can be predicted with mixtures of flavors.
+
+This shows significance in %'s.
+```{r echo=TRUE}
 limited_percents_flavor_data <- limited_percents_flavor_data[order(limited_percents_flavor_data$review_overall), ]
 
 limited_percents_flavor_data %>%
@@ -430,7 +435,7 @@ limited_percents_flavor_data %>%
         theme_minimal()
 ```
 
-Data visualized by raw values.
+This shows significance in raw amount in drinks.
 ```{r echo=FALSE}
 limited_flavor_data <- limited_flavor_data[order(limited_flavor_data$review_overall), ]
 
@@ -442,15 +447,17 @@ limited_flavor_data %>%
 ```
 
 Q: Can we find what characteristics will likely cause a beer to be rated highly?
-```{r echo=FALSE}
+
+
+We will determine flavor significance by creating perfect drinks with specific values being of the best.
+
+First a model must be created.
+```{r echo=TRUE}
 flavor_model <- lm(review_overall ~ Bitter + Sweet + Sour + Salty + Fruits + Hoppy + Spices + Malty, data = flavor_data)
 
 summary(flavor_model)
 ```
 
-Predicting based on the models, if an alcohol will have a high 'overall_review'.
-
-First create data of prime flavors. A prime flavor is the best rated beer with 1 column the same then the rest evenly spread.
 ```{r echo=FALSE}
 prime_flavors <- data.frame(matrix(ncol = ncol(flavor_data), nrow = 0))
 colnames(prime_flavors) <- colnames(flavor_data)
@@ -506,7 +513,9 @@ create_prime_flavor <- function(column) {
 }
 ```
 
-```{r echo=FALSE}
+Prime drinks are created with a specific flavor being of the best reviewed drink, then the rest of the values are average of all other drinks.
+
+```{r echo=TRUE}
 flavors <- c('Bitter', 'Sweet', 'Sour', 'Salty', 'Fruits', 'Hoppy', 'Spices', 'Malty', 'Base')
 
 for (flavor in flavors) {
@@ -526,9 +535,10 @@ for (row in seq_len(nrow(prime_flavors))) {
 head(prime_flavors, 8)
 ```
 
+Flavor significance can be understood by height difference in review scores of better than average flavors being the best ingredient.
 ```{r echo=FALSE}
 ggplot(prime_flavors, aes(x = Flavor, y = review_overall, fill = Flavor)) +
-        coord_cartesian(ylim=c(3,5)) +
+        coord_cartesian(ylim=c(3,4)) +
     geom_bar(stat = "identity")
 ```
 
